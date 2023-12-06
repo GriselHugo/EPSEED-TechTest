@@ -1,0 +1,41 @@
+# Use root/example as user/password credentials
+version: '3'
+
+services:
+  react-app:
+    build:
+      context: .
+      dockerfile: ./docker/Dockerfile.react
+    container_name: ett-app
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./app:/app
+    depends_on:
+      - mariadb
+      - go-api
+
+  go-api:
+    build:
+      context: .
+      dockerfile: ./docker/Dockerfile.go
+    container_name: ett-api
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./server:/app
+    depends_on:
+      - mariadb
+
+  mariadb:
+    build:
+      context: .
+      dockerfile: ./docker/Dockerfile.mariadb
+    container_name: ett-db
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./db:/app
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
