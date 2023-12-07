@@ -13,4 +13,4 @@ RUN go mod download
 # Copiez tout le contenu du répertoire actuel dans le répertoire de travail du conteneur
 COPY ./server .
 
-CMD ["sh", "-c", "go build -o server cmd/server/main.go && ./server"]
+CMD ["sh", "-c", "go build -o bin/server cmd/server/main.go && ./bin/server"]
