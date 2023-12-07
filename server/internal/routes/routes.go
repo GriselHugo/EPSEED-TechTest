@@ -41,6 +41,9 @@ func NewGlobalRouter() *mux.Router {
 	noteRouter := NewNoteRouter()
 	globalRouter.PathPrefix("/note").Handler(noteRouter)
 
+	// Routeur pour la racine
+	globalRouter.HandleFunc("/", handler.HandlerGo)
+
 	// Ajoutez d'autres routeurs pour d'autres entités au besoin
 
 	return globalRouter
