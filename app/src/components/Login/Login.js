@@ -20,12 +20,14 @@ function signUpButtons({ setAction, setIsLogged, setShowAlert, setAlertMessage, 
     }
 
     goServer.signUp(username, email, password).then((response) => {
-      if (response.status === 201) {
+      if (response.token !== undefined) {
+        console.log("Sign up done !");
         setIsLogged(true);
         localStorage.setItem("isLogged", 1);
         setShowAlert(false);
         setAlertMessage("");
-      } else if (response.status === 200) {
+      } else {
+        console.log("Sign up failed !");
         setIsLogged(false);
         localStorage.setItem("isLogged", 0);
         setShowAlert(true);
@@ -33,7 +35,6 @@ function signUpButtons({ setAction, setIsLogged, setShowAlert, setAlertMessage, 
       }
     }).catch((error) => {
       console.log("Error : " + error);
-
       setIsLogged(false);
       localStorage.setItem("isLogged", 0);
       setShowAlert(true);
@@ -58,7 +59,9 @@ function loginButtons({ setAction, setIsLogged, setShowAlert, setAlertMessage, e
     }
 
     goServer.logIn(email, password).then((response) => {
-      if (response.status === 200) {
+      if (response.token !== undefined) {
+        console.log("Log in done !");
+
         setIsLogged(true);
         setShowAlert(false);
         setAlertMessage("");
