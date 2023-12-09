@@ -20,10 +20,14 @@ function signUpButtons({ setAction, setIsLogged, setShowAlert, setAlertMessage, 
     }
 
     goServer.signUp(username, email, password).then((response) => {
+
+      console.log("Sign up response: ", response);
+
       if (response.token !== undefined) {
         console.log("Sign up done !");
         setIsLogged(true);
         localStorage.setItem("isLogged", 1);
+        localStorage.setItem("currentUserId", parseInt(response.user_id));
         setShowAlert(false);
         setAlertMessage("");
       } else {
@@ -59,6 +63,9 @@ function loginButtons({ setAction, setIsLogged, setShowAlert, setAlertMessage, e
     }
 
     goServer.logIn(email, password).then((response) => {
+
+      console.log("Log in response: ", response);
+
       if (response.token !== undefined) {
         console.log("Log in done !");
 
@@ -66,6 +73,7 @@ function loginButtons({ setAction, setIsLogged, setShowAlert, setAlertMessage, e
         setShowAlert(false);
         setAlertMessage("");
         localStorage.setItem("isLogged", 1);
+        localStorage.setItem("currentUserId", parseInt(response.user_id));
       }
     }).catch((error) => {
       console.log("Error : " + error);

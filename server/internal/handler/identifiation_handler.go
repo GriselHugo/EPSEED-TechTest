@@ -24,6 +24,7 @@ func writeErrorResponse(w http.ResponseWriter, message string) {
 	response := Response{
 		Message: message,
 		Token: "",
+		UserId: 0,
 	}
 
 	returnJson, _ := json.Marshal(response)
@@ -58,6 +59,7 @@ func LogInHandler(w http.ResponseWriter, r *http.Request) {
 	var returnJson, _ = json.Marshal(Response{
 		Message: "Connexion réussie",
 		Token: "token",
+		UserId: user.ID,
 	})
 
 	w.Write(returnJson)
@@ -95,7 +97,7 @@ func SignUpHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = db.CreateUser(signupRequest.Username, signupRequest.Password, signupRequest.Email)
+	user, err = db.CreateUser(signupRequest.Username, signupRequest.Password, signupRequest.Email)
 	if err != nil {
 		writeErrorResponse(w, "Erreur lors de la création de l'utilisateur")
 		return
@@ -108,6 +110,7 @@ func SignUpHandler(w http.ResponseWriter, r *http.Request) {
 	var returnJson, _ = json.Marshal(Response{
 		Message: "Utilisateur créé",
 		Token: "token",
+		UserId: user.ID,
 	})
 
 	w.Write(returnJson)

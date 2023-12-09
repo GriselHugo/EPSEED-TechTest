@@ -8,6 +8,7 @@ import (
 type Response struct {
 	Message string `json:"message"`
 	Token 	string `json:"token"`
+	UserId 	int `json:"user_id"`
 }
 
 type OnlyId struct {

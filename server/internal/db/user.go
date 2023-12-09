@@ -35,10 +35,10 @@ func HashPassword(password, salt string) string {
 	return hashedPassword
 }
 
-func CreateUser(username, password, email string) error {
+func CreateUser(username, password, email string) (*User, error) {
 	salt, err := GenerateSalt()
 	if err != nil {
-		return err
+		return nil, err
 	}
 	hashedPassword := HashPassword(password, salt)
 	user := User{
@@ -48,7 +48,7 @@ func CreateUser(username, password, email string) error {
 		Salt: salt,
 	}
 	result := DbInstance.Create(&user)
-	return result.Error
+	return &user, result.Error
 }
 
 func GetUserByEmailandPassword(email, password string) (*User, error) {

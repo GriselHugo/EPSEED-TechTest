@@ -17,6 +17,8 @@ class GoServer {
 
             const response = await this.client.post('/signup', body);
 
+            // console.log("Sign up response: ", response );
+
             return response.data;
         } catch (error) {
             console.error("Error signing up: ", error.message);
@@ -32,6 +34,8 @@ class GoServer {
             };
 
             const response = await this.client.post('/login', body);
+
+            // console.log("Log in response: ", response );
 
             return response.data;
         } catch (error) {
