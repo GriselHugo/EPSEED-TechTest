@@ -123,11 +123,7 @@ function Login({ setIsLogged }) {
             <img src={showPassword ? eyeOpenIcon : eyeClosedIcon} alt="Toggle Password Visibility" onClick={() => setShowPassword(!showPassword)} width={30} height={25} />
           </div>
         </div>
-        {/* {action === "Login" ? (
-          <div className="forgot-password">
-            Lost password? <span>Click Here!</span>
-          </div>
-        ) : null} */}
+
         {showAlert ? (
           <div style={{ display: "flex", justifyContent: "center", paddingTop: "20px" }}>
             <Alert variant="danger" onClose={() => setShowAlert(false)} dismissible className="col-md-10">
@@ -140,7 +136,7 @@ function Login({ setIsLogged }) {
         ) : null}
         {action === "Sign Up"
           ? signUpButtons({ setAction, setIsLogged, setShowAlert, setAlertMessage, username, email, password })
-          : loginButtons({ setAction, setIsLogged, setShowAlert, setAlertMessage, username, password })}
+          : loginButtons({ setAction, setIsLogged, setShowAlert, setAlertMessage, email, password })}
       </div>
     </div>
   );
