@@ -7,13 +7,15 @@ class GoServer {
     });
   }
 
-    async signUp({ username, email, password }) {
+    async signUp( username, email, password ) {
         try {
             const body = {
                 username: username,
                 email: email,
                 password: password
             };
+
+            console.log("signUp body: ", body);
 
             const response = await this.client.post('/signup', body);
             return response.data;
@@ -23,12 +25,14 @@ class GoServer {
         }
     }
 
-    async logIn({ email, password }) {
+    async logIn( email, password ) {
         try {
             const body = {
                 email: email,
                 password: password
             };
+
+            console.log("logIn body: ", body);
 
             const response = await this.client.post('/login', body);
             return response.data;
