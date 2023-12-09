@@ -94,6 +94,19 @@ func GetUserByUsername(username string) (*User, error) {
 	return nil, nil
 }
 
+func GetUserByEmail(email string) (*User, error) {
+	users, err := GetUsers()
+	if err != nil {
+		return nil, err
+	}
+	for _, user := range users {
+		if user.Email == email {
+			return &user, nil
+		}
+	}
+	return nil, nil
+}
+
 func GetUserById(userID int) (*User, error) {
 	var user User
 	result := DbInstance.First(&user, userID)

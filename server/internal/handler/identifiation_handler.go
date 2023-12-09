@@ -84,6 +84,17 @@ func SignUpHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	user, err = db.GetUserByEmail(signupRequest.Email)
+	if err != nil {
+		writeErrorResponse(w, "Erreur lors de la récupération de l'utilisateur")
+		return
+	}
+
+	if user != nil {
+		writeErrorResponse(w, "Email déjà existant")
+		return
+	}
+
 	err = db.CreateUser(signupRequest.Username, signupRequest.Password, signupRequest.Email)
 	if err != nil {
 		writeErrorResponse(w, "Erreur lors de la création de l'utilisateur")
