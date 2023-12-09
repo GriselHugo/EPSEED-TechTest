@@ -70,7 +70,5 @@ func NewGlobalRouter() {
 
 	// Ajoutez d'autres routeurs pour d'autres routes au besoin
 
-	// return globalRouter
-
 	http.Handle("/", globalRouter)
 }
