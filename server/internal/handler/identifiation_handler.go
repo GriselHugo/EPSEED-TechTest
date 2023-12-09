@@ -7,7 +7,7 @@ import (
 )
 
 type LoginRequest struct {
-	Username string `json:"username"`
+	Email string `json:"email"`
 	Password string `json:"password"`
 }
 
@@ -40,7 +40,7 @@ func LogInHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user, err := db.GetUserByUsernameAndPassword(loginRequest.Username, loginRequest.Password)
+	user, err := db.GetUserByEmailandPassword(loginRequest.Email, loginRequest.Password)
 	if err != nil {
 		writeErrorResponse(w, "Erreur lors de la récupération de l'utilisateur")
 		return
