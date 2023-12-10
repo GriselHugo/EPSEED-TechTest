@@ -117,7 +117,7 @@ class GoServer {
       }
 
       async deleteNoteForUser(userId, noteId) {
-        console.log("Deleteeeeeee note for user: ", noteId, userId);
+        console.log("Delete note for user: ", noteId, userId);
 
         try {
           const body = {
