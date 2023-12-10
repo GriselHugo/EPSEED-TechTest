@@ -94,6 +94,49 @@ class GoServer {
             throw error;
         }
     }
+
+
+    async updateNoteForUser(userId, noteId, title, content) {
+        try {
+          const body = {
+            user_id: userId,
+            id: noteId,
+            title: title,
+            content: content,
+          };
+
+          const response = await this.client.put("/updatenote", body);
+
+          console.log("Update note response: ", response );
+
+          return response;
+        } catch (error) {
+          console.error("Erreur lors de la mise à jour de la note :", error.message);
+          throw error;
+        }
+      }
+
+      async deleteNoteForUser(userId, noteId) {
+        console.log("Deleteeeeeee note for user: ", noteId, userId);
+
+        try {
+          const body = {
+            user_id: userId,
+            id: noteId,
+          };
+
+          console.log("Delete note body: ", body);
+
+          const response = await this.client.delete("/deletenote", { data: body });
+
+          console.log("Delete note response: ", response );
+
+          return response;
+        } catch (error) {
+          console.error("Erreur lors de la suppression de la note :", error.message);
+          throw error;
+        }
+    }
 }
 
 const goServer = new GoServer();

@@ -13,20 +13,25 @@ type NotesRequest struct {
 	Content string `json:"content"`
 }
 
-type NotesWithIdRequest struct {
-	Id int `json:"id"`
-	Title string `json:"title"`
-	Content string `json:"content"`
-}
-
 type NoteResponse struct {
 	Message string `json:"message"`
 	Token 	string `json:"token"`
 	Id 	int `json:"id"`
 }
 
+type DeleteNoteRequest struct {
+	UserId int `json:"user_id"`
+	NoteId int `json:"id"`
+}
+
+type UpdateNoteRequest struct {
+	UserId  int   `json:"user_id"`
+	NoteId  int   `json:"id"`
+	Title   string `json:"title"`
+	Content string `json:"content"`
+}
+
 func AddNoteHandler(w http.ResponseWriter, r *http.Request) {
-	// Gestion de la requête
 	var noteRequest NotesRequest
 
 	err := json.NewDecoder(r.Body).Decode(&noteRequest)
@@ -55,63 +60,72 @@ func AddNoteHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func DeleteNoteHandler(w http.ResponseWriter, r *http.Request) {
-	// Gestion de la requête
-	var deleteRequest OnlyId
-
-	err := json.NewDecoder(r.Body).Decode(&deleteRequest)
-	if err != nil {
-		writeErrorResponse(w, "Erreur lors de la lecture du formulaire")
+	if r.Method != http.MethodDelete {
+		w.WriteHeader(http.StatusMethodNotAllowed)
 		return
 	}
 
-	err = db.DeleteNoteByID(deleteRequest.Id)
+	var deleteNoteRequest DeleteNoteRequest
+	err := json.NewDecoder(r.Body).Decode(&deleteNoteRequest)
+
 	if err != nil {
-		writeErrorResponse(w, "Erreur lors de la suppression de la note")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	err = db.DeleteNoteForUser(deleteNoteRequest.UserId, deleteNoteRequest.NoteId)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
 	w.WriteHeader(http.StatusOK)
 
-	w.Header().Set("Content-Type", "application/json")
+	w.Header().Add("Content-Type", "application/json")
 
-	var returnJson, _ = json.Marshal(Response{
-		Message: "Note supprimée",
+	var returnJson, _ = json.Marshal(NoteResponse{
+		Message: "Note supprimée avec succès",
 		Token: "token",
+		Id: deleteNoteRequest.NoteId,
 	})
 
 	w.Write(returnJson)
 }
 
 func UpdateNoteHandler(w http.ResponseWriter, r *http.Request) {
-	// Gestion de la requête
-	var noteRequest NotesWithIdRequest
-
-	err := json.NewDecoder(r.Body).Decode(&noteRequest)
-	if err != nil {
-		writeErrorResponse(w, "Erreur lors de la lecture du formulaire")
+	if r.Method != http.MethodPut {
+		w.WriteHeader(http.StatusMethodNotAllowed)
 		return
 	}
 
-	err = db.UpdateNote(noteRequest.Id, noteRequest.Title, noteRequest.Content)
+	var updateNoteRequest UpdateNoteRequest
+	err := json.NewDecoder(r.Body).Decode(&updateNoteRequest)
+
 	if err != nil {
-		writeErrorResponse(w, "Erreur lors de la mise à jour de la note")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	note, err := db.UpdateNoteForUser(updateNoteRequest.UserId, updateNoteRequest.NoteId, updateNoteRequest.Title, updateNoteRequest.Content)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
 	w.WriteHeader(http.StatusOK)
 
-	w.Header().Set("Content-Type", "application/json")
+	w.Header().Add("Content-Type", "application/json")
 
-	var returnJson, _ = json.Marshal(Response{
-		Message: "Note mise à jour",
+	var returnJson, _ = json.Marshal(NoteResponse{
+		Message: "Note mise à jour avec succès",
 		Token: "token",
+		Id: note.ID,
 	})
 
 	w.Write(returnJson)
 }
 
 func GetNotesByUserHandler(w http.ResponseWriter, r *http.Request) {
-	// Gestion de la requête
 	if r.Method != http.MethodGet {
 		w.WriteHeader(http.StatusMethodNotAllowed)
 		return

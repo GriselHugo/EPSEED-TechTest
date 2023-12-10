@@ -3,36 +3,11 @@ import goServer from "../../api/go-server";
 
 import "./Note.css";
 
-const NoteModifier = () => {
-    return (
-        <div className="NoteModifier">
-            <h2>Modifier une note</h2>
-            <form>
-                <label>
-                    Titre :
-                    <br />
-                    <input type="text" name="title" />
-                </label>
-                <br />
-                <label>
-                    Contenu :
-                    <br />
-                    <textarea
-                        type="text"
-                        name="content"
-                        style={{ height: '200px', resize: 'none' }}
-                    />
-                </label>
-                <br />
-                <button type="submit">Enregistrer la note</button>
-            </form>
-        </div>
-    );
-};
-
 function Note() {
     const [newNote, setNewNote] = useState({ title: '', content: '' });
     const [notes, setNotes] = useState([]);
+    const [showNoteModifier, setShowNoteModifier] = useState(false);
+    const [noteToModify, setNoteToModify] = useState({ title: '', content: '', id: '' });
 
     useEffect(() => {
             console.log('Current user id :', parseInt(localStorage.getItem("currentUserId")));
@@ -44,12 +19,15 @@ function Note() {
         });
     }, []);
 
-
-
     const handleChange = (e) => {
-      const { name, value } = e.target;
-      setNewNote((prevNote) => ({ ...prevNote, [name]: value }));
+        const { name, value } = e.target;
+        setNewNote((prevNote) => ({ ...prevNote, [name]: value }));
     };
+
+    const handleModify = (e) => {
+        const { name, value } = e.target;
+        setNoteToModify((prevNote) => ({ ...prevNote, [name]: value }));
+    }
 
     const handleSubmit = (e) => {
             if (newNote.title === "" || newNote.content === "") {
@@ -60,7 +38,7 @@ function Note() {
             goServer.createNote(parseInt(localStorage.getItem("currentUserId")), newNote.title, newNote.content).then((response) => {
             console.log("Create note response: ", response);
             const noteToAdd = {
-                ID: response.ID,
+                ID: response.id,
                 Title: newNote.title,
                 Content: newNote.content
             };
@@ -70,6 +48,45 @@ function Note() {
         });
         setNewNote({ title: '', content: '' });
     };
+
+    const handleSubmitModification = (e) => {
+        if (noteToModify.title === "" || noteToModify.content === "") {
+            return;
+        }
+        e.preventDefault();
+        console.log('Note à modifier :', noteToModify);
+        goServer.updateNoteForUser(parseInt(localStorage.getItem("currentUserId")), noteToModify.id, noteToModify.title, noteToModify.content).then((response) => {
+            console.log("Update note response: ", response.data.id);
+            const noteToAdd = {
+                ID: response.data.id,
+                Title: noteToModify.title,
+                Content: noteToModify.content
+            };
+            const index = notes.findIndex((note) => note.ID === noteToModify.id);
+            const newNotes = [...notes];
+            newNotes[index] = noteToAdd;
+            setNotes(newNotes);
+            setShowNoteModifier(false);
+        }).catch((error) => {
+            console.log("Error : " + error);
+        });
+        setNoteToModify({ title: '', content: '', id: '' });
+    }
+
+    const deleteNote = () => {
+        console.log('Note à supprimer :', noteToModify);
+        goServer.deleteNoteForUser(parseInt(localStorage.getItem("currentUserId")), noteToModify.id).then((response) => {
+            console.log("Delete note response: ", response);
+            const index = notes.findIndex((note) => note.ID === noteToModify.id);
+            const newNotes = [...notes];
+            newNotes.splice(index, 1);
+            setNotes(newNotes);
+            setShowNoteModifier(false);
+        }).catch((error) => {
+            console.log("Error : " + error);
+        });
+        setNoteToModify({ title: '', content: '', id: '' });
+    }
 
     return (
         <div className="NoteContainer">
@@ -109,7 +126,13 @@ function Note() {
             { notes.length === 0 ? <p>Aucune note à afficher </p> :
                 <ul>
                     {notes.map((note) => (
-                        <li key={note.ID}>
+                        <li key={note.ID} onClick={
+                            () => {
+                                console.log('Note cliquée :', note.ID)
+                                setNoteToModify({ title: note.Title, content: note.Content, id: note.ID });
+                                setShowNoteModifier(true);
+                            }
+                        } >
                             <h3>{note.Title}</h3><br />
                             <p>{note.Content}</p>
                         </li>
@@ -118,7 +141,43 @@ function Note() {
             }
         </div>
 
-            <NoteModifier />
+        <div className="NoteModifier">
+            <h2>Modifier une note</h2>
+            { showNoteModifier ? (
+            <form onSubmit={handleSubmitModification}>
+            <label>
+                Titre :
+                <br />
+                <input
+                    type="text"
+                    name="title"
+                    value={noteToModify.title}
+                    onChange={handleModify}
+                />
+            </label>
+            <br />
+            <label>
+                Contenu :
+                <br />
+                <textarea
+                    type="text"
+                    name="content"
+                    value={noteToModify.content}
+                    style={{ height: '200px', resize: 'none' }}
+                    onChange={handleModify}
+                />
+            </label>
+            <br />
+            <button type="submit" className="submitNote">Modifier la note</button>
+            <button className="removeNote" onClick={() => deleteNote()}>Supprimer la note</button>
+            <button className="submitNote" onClick={() => {
+                setShowNoteModifier(false);
+                setNewNote({ title: '', content: '', id: '' });
+            }}>Annuler</button>
+        </form>
+            ) : <p>Choisissez une note à modifier</p>}
+        </div>
+
         </div>
     );
 }

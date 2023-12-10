@@ -45,20 +45,24 @@ func GetAllNotes() ([]Note, error) {
 	return notes, result.Error
 }
 
-func UpdateNote(noteID int, newTitle, newContent string) error {
-	// Mise à jour d'une note dans la table 'notes'
-	note, err := GetNoteByID(noteID)
-	if err != nil {
-		return err
+func UpdateNoteForUser(UserId int, NoteId int, Title string, Content string) (*Note, error) {
+	var note Note
+	result := DbInstance.Where("user_id = ? AND id = ?", UserId, NoteId).First(&note)
+	if result.Error != nil {
+		return nil, result.Error
 	}
-	note.Title = newTitle
-	note.Content = newContent
-	result := DbInstance.Save(&note)
-	return result.Error
+	note.Title = Title
+	note.Content = Content
+	result = DbInstance.Save(&note)
+	return &note, result.Error
 }
 
-func DeleteNoteByID(noteID int) error {
-	// Suppression d'une note de la table 'notes'
-	result := DbInstance.Delete(&Note{}, noteID)
+func DeleteNoteForUser(UserId int, NoteId int) error {
+	var note Note
+	result := DbInstance.Where("user_id = ? AND id = ?", UserId, NoteId).First(&note)
+	if result.Error != nil {
+		return result.Error
+	}
+	result = DbInstance.Delete(&note)
 	return result.Error
 }
