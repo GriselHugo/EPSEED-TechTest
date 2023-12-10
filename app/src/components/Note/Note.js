@@ -56,9 +56,9 @@ function Note() {
         e.preventDefault();
         console.log('Note à modifier :', noteToModify);
         goServer.updateNoteForUser(parseInt(localStorage.getItem("currentUserId")), noteToModify.id, noteToModify.title, noteToModify.content).then((response) => {
-            console.log("Update note response: ", response.data.id);
+            console.log("Update note response: ", response.id);
             const noteToAdd = {
-                ID: response.data.id,
+                ID: response.id,
                 Title: noteToModify.title,
                 Content: noteToModify.content
             };
@@ -169,8 +169,8 @@ function Note() {
             </label>
             <br />
             <button type="submit" className="submitNote">Modifier la note</button>
-            <button className="removeNote" onClick={() => deleteNote()}>Supprimer la note</button>
-            <button className="submitNote" onClick={() => {
+            <button type="button" className="removeNote" onClick={() => deleteNote()}>Supprimer la note</button>
+            <button type="button" className="submitNote" onClick={() => {
                 setShowNoteModifier(false);
                 setNewNote({ title: '', content: '', id: '' });
             }}>Annuler</button>
