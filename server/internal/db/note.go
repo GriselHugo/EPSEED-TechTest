@@ -13,7 +13,7 @@ type Note struct {
 	UpdatedAt time.Time `gorm:"autoUpdateTime"`
 }
 
-func CreateNote(userID int, title, content string) error {
+func CreateNote(userID int, title, content string) (*Note, error) {
 	// Insertion d'une note dans la table 'notes'
 	note := Note{
 		UserID: userID,
@@ -21,7 +21,7 @@ func CreateNote(userID int, title, content string) error {
 		Content: content,
 	}
 	result := DbInstance.Create(&note)
-	return result.Error
+	return &note, result.Error
 }
 
 func GetNoteByID(noteID int) (*Note, error) {

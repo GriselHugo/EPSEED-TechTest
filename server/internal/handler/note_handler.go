@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"main/internal/db"
 	"encoding/json"
+	"strconv"
 )
 
 type NotesRequest struct {
@@ -18,6 +19,12 @@ type NotesWithIdRequest struct {
 	Content string `json:"content"`
 }
 
+type NoteResponse struct {
+	Message string `json:"message"`
+	Token 	string `json:"token"`
+	Id 	int `json:"id"`
+}
+
 func AddNoteHandler(w http.ResponseWriter, r *http.Request) {
 	// Gestion de la requête
 	var noteRequest NotesRequest
@@ -28,7 +35,7 @@ func AddNoteHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = db.CreateNote(noteRequest.UserId, noteRequest.Title, noteRequest.Content)
+	note, err := db.CreateNote(noteRequest.UserId, noteRequest.Title, noteRequest.Content)
 	if err != nil {
 		writeErrorResponse(w, "Erreur lors de l'ajout de la note")
 		return
@@ -38,9 +45,10 @@ func AddNoteHandler(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 
-	var returnJson, _ = json.Marshal(Response{
+	var returnJson, _ = json.Marshal(NoteResponse{
 		Message: "Note ajoutée",
 		Token: "",
+		Id: note.ID,
 	})
 
 	w.Write(returnJson)
@@ -68,7 +76,7 @@ func DeleteNoteHandler(w http.ResponseWriter, r *http.Request) {
 
 	var returnJson, _ = json.Marshal(Response{
 		Message: "Note supprimée",
-		Token: "",
+		Token: "token",
 	})
 
 	w.Write(returnJson)
@@ -96,73 +104,34 @@ func UpdateNoteHandler(w http.ResponseWriter, r *http.Request) {
 
 	var returnJson, _ = json.Marshal(Response{
 		Message: "Note mise à jour",
-		Token: "",
+		Token: "token",
 	})
-
-	w.Write(returnJson)
-}
-
-func GetNoteHandler(w http.ResponseWriter, r *http.Request) {
-	// Gestion de la requête
-	var getRequest OnlyId
-
-	err := json.NewDecoder(r.Body).Decode(&getRequest)
-	if err != nil {
-		writeErrorResponse(w, "Erreur lors de la lecture du formulaire")
-		return
-	}
-
-	note, err := db.GetNoteByID(getRequest.Id)
-	if err != nil {
-		writeErrorResponse(w, "Erreur lors de la récupération de la note")
-		return
-	}
-
-	w.WriteHeader(http.StatusOK)
-
-	w.Header().Set("Content-Type", "application/json")
-
-	var returnJson, _ = json.Marshal(note)
-
-	w.Write(returnJson)
-}
-
-func GetAllNotesHandler(w http.ResponseWriter, r *http.Request) {
-	// Gestion de la requête
-	notes, err := db.GetAllNotes()
-	if err != nil {
-		writeErrorResponse(w, "Erreur lors de la récupération des notes")
-		return
-	}
-
-	w.WriteHeader(http.StatusOK)
-
-	w.Header().Set("Content-Type", "application/json")
-
-	var returnJson, _ = json.Marshal(notes)
 
 	w.Write(returnJson)
 }
 
 func GetNotesByUserHandler(w http.ResponseWriter, r *http.Request) {
 	// Gestion de la requête
-	var getRequest OnlyId
-
-	err := json.NewDecoder(r.Body).Decode(&getRequest)
-	if err != nil {
-		writeErrorResponse(w, "Erreur lors de la lecture du formulaire")
+	if r.Method != http.MethodGet {
+		w.WriteHeader(http.StatusMethodNotAllowed)
 		return
 	}
 
-	notes, err := db.GetNotesByUserID(getRequest.Id)
+	id, err := strconv.ParseUint(r.URL.Query().Get("id"), 10, 64)
 	if err != nil {
-		writeErrorResponse(w, "Erreur lors de la récupération des notes")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	notes, err := db.GetNotesByUserID(int(id))
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
 	w.WriteHeader(http.StatusOK)
 
-	w.Header().Set("Content-Type", "application/json")
+	w.Header().Add("Content-Type", "application/json")
 
 	var returnJson, _ = json.Marshal(notes)
 

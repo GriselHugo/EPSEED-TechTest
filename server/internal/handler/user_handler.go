@@ -65,18 +65,19 @@ func GetUserHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func GetAllUsersHandler(w http.ResponseWriter, r *http.Request) {
-	// Gestion de la requête
 	users, err := db.GetUsers()
 	if err != nil {
-		writeErrorResponse(w, "Erreur lors de la récupération des utilisateurs")
+		http.Error(w, "Erreur de requête des utilisateurs", http.StatusInternalServerError)
 		return
 	}
 
-	w.WriteHeader(http.StatusOK)
+	usersJSON, err := json.Marshal(users)
+	if err != nil {
+		http.Error(w, "Erreur d'encodage JSON", http.StatusInternalServerError)
+		return
+	}
 
 	w.Header().Set("Content-Type", "application/json")
 
-	var returnJson, _ = json.Marshal(users)
-
-	w.Write(returnJson)
+	w.Write(usersJSON)
 }

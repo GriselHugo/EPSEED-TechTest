@@ -15,7 +15,7 @@ function Navbar() {
 
     const logOut = () => {
         localStorage.setItem("isLogged", 0)
-        localStorage.setItem("currentUserId", -1);
+        localStorage.setItem("currentUserId", "");
         window.location.reload();
     }
 

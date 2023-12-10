@@ -46,10 +46,51 @@ class GoServer {
 
     async getUsers() {
         try {
-            const response = await this.client.get('/user/getall');
+            const response = await this.client.get('/getall');
+
+            // console.log("Get users response: ", response.data );
+
             return response.data;
         } catch (error) {
             console.error("Error getting users: ", error.message);
+            throw error;
+        }
+    }
+
+    async createNote( userId, title, content ) {
+        try {
+            const body = {
+                user_id: userId,
+                title: title,
+                content: content
+            };
+
+            console.log("Create note body: ", body);
+
+            const response = await this.client.post('/createnote', body);
+
+            // console.log("Create note response: ", response );
+
+            return response.data;
+        } catch (error) {
+            console.error("Error creating note: ", error.message);
+            throw error;
+        }
+    }
+
+    async getNotes( userId ) {
+        try {
+            const body = {
+                id: userId
+              };
+
+            const response = await this.client.get('/getnote', { params: body });
+
+            console.log("Get notes response: ", response.data );
+
+            return response.data;
+        } catch (error) {
+            console.error("Error getting notes: ", error.message);
             throw error;
         }
     }
