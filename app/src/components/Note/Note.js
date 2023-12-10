@@ -124,20 +124,20 @@ function Note() {
         <div className="NoteList">
             <h2>Liste des notes</h2>
             { notes.length === 0 ? <p>Aucune note à afficher </p> :
-                <ul>
+                <div className="NoteListHeader">
                     {notes.map((note) => (
-                        <li key={note.ID} onClick={
+                        <div className="NoteListItem" key={note.ID} onClick={
                             () => {
                                 console.log('Note cliquée :', note.ID)
                                 setNoteToModify({ title: note.Title, content: note.Content, id: note.ID });
                                 setShowNoteModifier(true);
                             }
                         } >
-                            <h3>{note.Title}</h3><br />
+                            <p><h3>{note.Title}</h3></p>
                             <p>{note.Content}</p>
-                        </li>
+                        </div>
                     ))}
-                </ul>
+                </div>
             }
         </div>
 

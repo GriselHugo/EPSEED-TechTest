@@ -25,7 +25,7 @@ function Navbar() {
 
             <nav id="navBar" ref={navRef}>
                 <Link to="/">Home</Link>
-                <Link to="/note">Note</Link>
+                <Link to="/note">Notes</Link>
                 <button className="nav-btn nav-close-btn" onClick={toggleNav}>
                     <FaTimes />
                 </button>
